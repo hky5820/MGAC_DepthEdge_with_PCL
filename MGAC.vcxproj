@@ -86,6 +86,7 @@
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>$(SolutionDIr)3rdParty\glm;$(SolutionDir)3rdParty\Realsense\include;$(ProjectDir)include;$(SolutionDir)3rdParty\opencv4.1.2\include;$(SolutionDir)3rdParty\pcl1.9.1\include;$(SolutionDir)3rdParty\pcl1.9.1\3rdParty\Boost\include;$(SolutionDir)3rdParty\pcl1.9.1\3rdParty\FLANN\include;$(SolutionDIr)3rdParty\pcl1.9.1\3rdParty\Eigen\eigen3;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_SILENCE_FPOS_SEEKPOS_DEPRECATION_WARNING;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <AdditionalLibraryDirectories>$(SolutionDir)3rdParty\Realsense\lib\$(Configuration);$(SolutionDir)3rdParty\opencv4.1.2\lib;$(SolutionDir)3rdParty\pcl1.9.1\lib;$(SolutionDir)3rdParty\pcl1.9.1\3rdParty\Boost\lib;$(SolutionDir)3rdParty\pcl1.9.1\3rdParty\FLANN\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
@@ -116,6 +117,7 @@
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>$(SolutionDIr)3rdParty\glm;$(SolutionDir)3rdParty\Realsense\include;$(ProjectDir)include;$(SolutionDir)3rdParty\opencv4.1.2\include;$(SolutionDir)3rdParty\pcl1.9.1\include;$(SolutionDir)3rdParty\pcl1.9.1\3rdParty\Boost\include;$(SolutionDir)3rdParty\pcl1.9.1\3rdParty\FLANN\include;$(SolutionDIr)3rdParty\pcl1.9.1\3rdParty\Eigen\eigen3;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_SILENCE_FPOS_SEEKPOS_DEPRECATION_WARNING;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>

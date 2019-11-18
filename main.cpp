@@ -126,7 +126,7 @@ int main() {
 
 	ms::MorphSnakeParam ms_param(2000, 3, ms::CHANNEL::RED, 50, 0.15, 1, 1);
 	ms::InitLevelSetParam ls_param(intrin_color.height/2, intrin_color.width/2, 10);
-	ms::VisualizationParam vs_param(false, false);
+	ms::VisualizationParam vs_param(false, false, false);
 	bool streaming_segmentation_on = false;
 	bool is_image_saved = false;
 	bool load_img_segmnetation_on = false;
@@ -161,7 +161,7 @@ int main() {
 			cv::destroyAllWindows();
 		}
 		if (load_img_segmnetation_on) {
-			cv::Mat mask = segmentor.doSegmentation(saved_img, saved_depth, ms_param, ls_param, 2, ms::MASK_AT::COLOR, vs_param);
+			cv::Mat mask = segmentor.doSegmentation(saved_img, saved_depth, ms_param, ls_param, vs_param, 2, ms::MASK_AT::COLOR);
 			cv::Mat ol = overlay(saved_img, 0.4, mask, 0.6);
 			cv::imshow("ol", ol);
 		}
@@ -172,7 +172,7 @@ int main() {
 		}
 		if (streaming_segmentation_on) {
 			c_time start = std::chrono::high_resolution_clock::now();
-			cv::Mat mask = segmentor.doSegmentation(color_mat, depth_mat, ms_param, ls_param, downscale, ms::MASK_AT::COLOR, vs_param);
+			cv::Mat mask = segmentor.doSegmentation(color_mat, depth_mat, ms_param, ls_param, vs_param, downscale, ms::MASK_AT::COLOR);
 			c_time end = std::chrono::high_resolution_clock::now();
 			std::chrono::duration<double> time = end - start;
 			
@@ -188,7 +188,7 @@ int main() {
 			cv::destroyAllWindows();
 		}
 		if (vs_param.warpping_on) {
-			cv::Mat mask = segmentor.doSegmentation(color_mat, depth_mat, ms_param, ls_param, 2, ms::MASK_AT::COLOR, vs_param);
+			cv::Mat mask = segmentor.doSegmentation(color_mat, depth_mat, ms_param, ls_param, vs_param, 2, ms::MASK_AT::COLOR);
 			cv::imwrite("depth.png", depth_mat);
 			cv::imwrite("color.png", mask);
 			cv::Mat ol = overlay(c_depth_mat, 0.4, mask, 0.6);
@@ -198,6 +198,10 @@ int main() {
 		if (key == '1') {
 			vs_param.inv_edge_on = !vs_param.inv_edge_on;
 			cv::destroyWindow("Inv_Edge");
+		}
+		if (key == '2') {
+			vs_param.depth_edge_on= !vs_param.depth_edge_on;
+			cv::destroyWindow("Depth_Edge");
 		}
 		
 		cv::imshow("depth", c_depth_mat);

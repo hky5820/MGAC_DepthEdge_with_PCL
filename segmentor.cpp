@@ -36,17 +36,20 @@ cv::Mat Segmentor::doSegmentation(
 	const cv::Mat& depth, 
 	const MorphSnakeParam & ms_param, 
 	const InitLevelSetParam& ls_param,
+	const VisualizationParam& vs_param,
 	int downscale, 
-	int mask_in_depth_or_color,
-	const VisualizationParam& vs_param) {
+	int mask_in_depth_or_color) {
 
+	// Down Scaling
 	cv::Mat resized_color, resized_depth;
 	cv::resize(color, resized_color, cv::Size(color.cols / downscale, color.rows / downscale));
 	cv::resize(depth, resized_depth, cv::Size(depth.cols / downscale, depth.rows / downscale));
 
+	// Depth To Point Cloud
 	pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud(new pcl::PointCloud<pcl::PointXYZRGB>);
 	pc_helper::depthToPointcloud_pcl(resized_color, resized_depth, depth_intrinsic_.fx, depth_intrinsic_.fy, depth_intrinsic_.ppx, depth_intrinsic_.ppy, downscale, cloud);
 
+	// RGB Image Warpping ( CS2DS )
 	cv::Mat warpped_color = cv::Mat::zeros(resized_depth.rows, resized_depth.cols, CV_8UC3);
 	warpper_->setHomography(resized_color, cloud, downscale);
 	warpper_->warpRGB_CS2DS(resized_color, warpped_color, INTERPOLATION::bilinear);
@@ -56,28 +59,30 @@ cv::Mat Segmentor::doSegmentation(
 		return output;
 	}
 	
+	// Calculate Normal
 	pcl::PointCloud<pcl::Normal>::Ptr normal(new pcl::PointCloud<pcl::Normal>);
 	estimateNormals(normal, cloud, 0.005);
 
+	// Extract Depth Edge from Normal + Point Cloud
 	cv::Mat d_edge = cv::Mat::zeros(resized_depth.size(), CV_8UC1);
 	detectDepthEdge(d_edge, cloud, normal, 0.5f, 0.8f);
-	cv::imshow("d_edge", d_edge);
+	if(vs_param.depth_edge_on) 
+		cv::imshow("Depth_Edge", d_edge);
 
-	// Resized Warpped RGB to Gray (16 bit)
-	cv::Mat gray = filter_->RGB2GRAY(warpped_color, ms_param.channel);
-	
-	// Making Inverse Edge Map
+	// Make Inverse Edge Map from Gray Scale Image
 	int window_size = 3;
+	cv::Mat gray = filter_->RGB2GRAY(warpped_color, ms_param.channel);
 	cv::Mat inv_edge_map = filter_->inverse_edge_map(gray, ms_param.alpha, ms_param.sigma, window_size);
 	if (vs_param.inv_edge_on) 
 		cv::imshow("Inv_Edge", inv_edge_map);
 
-	// Make Init Level Set (Circle)
+	// Make Init Level Set ( Circle )
 	cv::Mat init_ls = filter_->make_init_ls({ inv_edge_map.rows , inv_edge_map.cols }, { ls_param.center_row / downscale, ls_param.center_col / downscale }, ls_param.radius);
 
 	// Morphological Snake
 	cv::Mat mask = morphological_geodesic_active_contour(inv_edge_map, d_edge, init_ls, ms_param.threshold, ms_param.iteration,  ms_param.smoothing, ms_param.ballon);
-
+	
+	// Warp Mask Image ( DS2CS )
 	if (mask_in_depth_or_color == MASK_AT::COLOR) {
 		cv::Mat warpped_mask  = cv::Mat::zeros(mask.rows, mask.cols, CV_8UC1);
 		warpper_->warpGray_DS2CS(mask, warpped_mask);
@@ -88,7 +93,7 @@ cv::Mat Segmentor::doSegmentation(
 		return output;
 	}
 
-	// Return Mask at Depth Space
+	// Return Mask of Depth Space
 	cv::Mat output;
 	cv::resize(mask, output, cv::Size(mask.cols * downscale, mask.rows * downscale));
 	return output;

@@ -29,9 +29,11 @@ namespace ms {
 	public:
 		cv::Mat doSegmentation(
 			const cv::Mat & color, const cv::Mat & depth,
-			const MorphSnakeParam & ms_param, const InitLevelSetParam& ls_param,
-			int downscale, int mask_in_depth_or_color,
-			const VisualizationParam& vs_param);
+			const MorphSnakeParam & ms_param, 
+			const InitLevelSetParam& ls_param,
+			const VisualizationParam& vs_param,
+			int downscale, 
+			int mask_in_depth_or_color);
 
 	private:
 		void estimateNormals(pcl::PointCloud<pcl::Normal>::Ptr normal, const pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud, double radius);

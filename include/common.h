@@ -63,10 +63,12 @@ namespace ms {
 	};
 
 	struct VisualizationParam {
-		VisualizationParam(bool inv_edge_on_, bool warpping_on_) :
+		VisualizationParam(bool inv_edge_on_, bool depth_edge_on_, bool warpping_on_) :
 			inv_edge_on(inv_edge_on_),
+			depth_edge_on(depth_edge_on_),
 			warpping_on(warpping_on_) {}
 		bool inv_edge_on;
+		bool depth_edge_on;
 		bool warpping_on;
 	};
 
