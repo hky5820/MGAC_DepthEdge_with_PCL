@@ -129,7 +129,6 @@
   <ItemGroup>
     <ClCompile Include="filter.cpp" />
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="morphsnake.cpp" />
     <ClCompile Include="segmentor.cpp" />
     <ClCompile Include="warpper.cpp" />
   </ItemGroup>
@@ -137,7 +136,6 @@
     <ClInclude Include="include\common.h" />
     <ClInclude Include="include\filter.h" />
     <ClInclude Include="include\helper.h" />
-    <ClInclude Include="include\morphsnake.h" />
     <ClInclude Include="include\segmentor.h" />
     <ClInclude Include="include\warpper.h" />
   </ItemGroup>

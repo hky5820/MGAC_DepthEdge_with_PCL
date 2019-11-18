@@ -21,9 +21,6 @@
     <ClCompile Include="filter.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
-    <ClCompile Include="morphsnake.cpp">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
     <ClCompile Include="segmentor.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
@@ -39,9 +36,6 @@
       <Filter>헤더 파일</Filter>
     </ClInclude>
     <ClInclude Include="include\helper.h">
-      <Filter>헤더 파일</Filter>
-    </ClInclude>
-    <ClInclude Include="include\morphsnake.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
     <ClInclude Include="include\segmentor.h">
