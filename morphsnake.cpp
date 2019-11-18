@@ -3,7 +3,6 @@
 #include <iostream>
 
 #include <opencv2/imgproc.hpp> // morphological operation
-#include <opencv2/highgui.hpp>
 
 #include "filter.h"
 
@@ -61,9 +60,6 @@ cv::Mat MorphSnake::morphological_geodesic_active_contour(
 				for (int c = 0; c < cols; c++) {
 					if (tmb_data[r * cols + c])
 						u_data[r * cols + c] = aux_data[r * cols + c];
-					else {
-						//u_data[r * cols + c] = 0;
-					}
 				}
 			}
 		}

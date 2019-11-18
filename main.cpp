@@ -48,13 +48,11 @@ cv::Mat	overlay(const cv::Mat &img1, float w1, const cv::Mat &img2, float w2) {
 
 int main() {
 #pragma region RealSense Initialize
-	
 	rs2::context ctx;
 	if (ctx.query_devices().size() == 0) {
 		std::cout << "[Error; realsense] realsense stream is not available" << std::endl;
 		return false;
 	}
-
 	rs2::config cfg;
 	//cfg.enable_stream(RS2_STREAM_COLOR, 1280, 720, RS2_FORMAT_RGB8);
 	//cfg.enable_stream(RS2_STREAM_DEPTH, 1280, 720, RS2_FORMAT_Z16);
@@ -120,26 +118,24 @@ int main() {
 	cv::Mat saved_depth = cv::Mat::zeros(cv::Size(d_width, d_height), CV_16UC1);
 	cv::Mat c_depth_mat = cv::Mat::zeros(cv::Size(d_width, d_height), CV_8UC3);
 
-	int key = -1;
-
 	ms::Intrinsic_
 		color_int(intrin_color.fx, intrin_color.fy, intrin_color.ppx, intrin_color.ppy, intrin_color.width, intrin_color.height),
 		depth_int(intrin_depth.fx, intrin_depth.fy, intrin_depth.ppx, intrin_depth.ppy, intrin_depth.width, intrin_depth.height);
 
 	ms::Segmentor segmentor(color_int, depth_int, extrinsic);
 
-	ms::DepthEdgeParam de_param(1.2, 2);
 	ms::MorphSnakeParam ms_param(2000, 3, ms::CHANNEL::RED, 50, 0.15, 1, 1);
-	ms::CannyParam cn_param(700, 1500, true);
-	ms::InitLevelSetParam ls_param(240, 320, 10);
-	ms::VisualizationParam vs_param(false, false, false, false, false);
-	ms::EdgeSelectionParam es_param(true, true);
+	ms::InitLevelSetParam ls_param(intrin_color.height/2, intrin_color.width/2, 10);
+	ms::VisualizationParam vs_param(false, false);
 	bool streaming_segmentation_on = false;
 	bool is_image_saved = false;
 	bool load_img_segmnetation_on = false;
+	int downscale = 2;
+
 	int size = 0;
 	float sum = 0;
 
+	int key = -1;
 	while (key != 'q') {
 #pragma region GetRealSenseFrame
 		// Original FrameSet
@@ -165,7 +161,7 @@ int main() {
 			cv::destroyAllWindows();
 		}
 		if (load_img_segmnetation_on) {
-			cv::Mat mask = segmentor.doSegmentation(saved_img, saved_depth, de_param, cn_param, ms_param, ls_param, 2, ms::MASK_AT::COLOR, vs_param, es_param);
+			cv::Mat mask = segmentor.doSegmentation(saved_img, saved_depth, ms_param, ls_param, 2, ms::MASK_AT::COLOR, vs_param);
 			cv::Mat ol = overlay(saved_img, 0.4, mask, 0.6);
 			cv::imshow("ol", ol);
 		}
@@ -176,9 +172,8 @@ int main() {
 		}
 		if (streaming_segmentation_on) {
 			c_time start = std::chrono::high_resolution_clock::now();
-			cv::Mat mask = segmentor.doSegmentation(color_mat, depth_mat, de_param, cn_param, ms_param, ls_param, 2, ms::MASK_AT::COLOR, vs_param, es_param);
+			cv::Mat mask = segmentor.doSegmentation(color_mat, depth_mat, ms_param, ls_param, downscale, ms::MASK_AT::COLOR, vs_param);
 			c_time end = std::chrono::high_resolution_clock::now();
-			//cv::Mat mask = segmentor.doSegmentation(color, aligned_depth, de_param, cn_param, ms_param, ls_param, downscale, ms::MASK_AT::COLOR);
 			std::chrono::duration<double> time = end - start;
 			
 			std::cout << 1. / (time.count()) << "FPS";
@@ -188,42 +183,22 @@ int main() {
 			cv::imshow("ol", ol);
 		}
 
-
 		if (key == 'w'/*Warp Color Image To Depth Space*/) {
 			vs_param.warpping_on = !vs_param.warpping_on;
 			cv::destroyAllWindows();
 		}
 		if (vs_param.warpping_on) {
-			cv::Mat mask = segmentor.doSegmentation(color_mat, depth_mat, de_param, cn_param, ms_param, ls_param, 2, ms::MASK_AT::COLOR, vs_param, es_param);
+			cv::Mat mask = segmentor.doSegmentation(color_mat, depth_mat, ms_param, ls_param, 2, ms::MASK_AT::COLOR, vs_param);
+			cv::imwrite("depth.png", depth_mat);
+			cv::imwrite("color.png", mask);
 			cv::Mat ol = overlay(c_depth_mat, 0.4, mask, 0.6);
 			cv::imshow("ol", ol);
 		}
 		
 		if (key == '1') {
-			vs_param.depth_edge_on = !vs_param.depth_edge_on;
-			cv::destroyWindow("Depth_Edge");
-		}
-		if (key == '2') {
-			vs_param.canny_edge_on = !vs_param.canny_edge_on;
-			cv::destroyWindow("Canny_Edge");
-		}
-		if (key == '3') {
-			vs_param.merge_edge_on = !vs_param.merge_edge_on;
-			cv::destroyWindow("Merged_Edge");
-		}
-		if (key == '4') {
 			vs_param.inv_edge_on = !vs_param.inv_edge_on;
 			cv::destroyWindow("Inv_Edge");
 		}
-
-
-		if (key == 'o') {
-			es_param.use_depth_edge = !es_param.use_depth_edge;
-		}
-		if (key == 'p') {
-			es_param.use_canny_edge= !es_param.use_canny_edge;
-		}
-
 		
 		cv::imshow("depth", c_depth_mat);
 		cv::imshow("color", color_mat);

@@ -21,22 +21,6 @@ namespace ms {
 		DEPTH
 	};
 
-	struct DepthEdgeParam {
-		DepthEdgeParam() {};
-
-		DepthEdgeParam(
-			float threshold_,
-			int radius_) :
-			threshold(threshold_),
-			radius(radius_) {}
-
-		// [Coplanarity Check] : || A - X || + || B - X || ) / || A - B ||  값의 threshold,
-		// threshold가 높을수록, 각이 크게 꺾이는 line위에 놓여져 있는 point들만 검출되게 됨
-		// range : 1~2 정도
-		float threshold;
-		int radius; // Coplanarity Check 할 때, neighborhood의 범위
-	};
-
 	struct MorphSnakeParam {
 		MorphSnakeParam() {};
 		MorphSnakeParam(
@@ -63,23 +47,6 @@ namespace ms {
 		int ballon;    // 1 or -1 ( 팽창 or 축소 )
 	};
 
-	struct CannyParam {
-		CannyParam() {};
-		CannyParam(
-			int low_threshold_,
-			int high_threshold_,
-			bool L2gradient_) :
-			low_threshold(low_threshold_),
-			high_threshold(high_threshold_),
-			L2gradient(L2gradient_) {}
-
-		int low_threshold;
-		int high_threshold;
-		bool L2gradient;
-		// a flag, indicating whether a more accurate L2 norm =sqrt((dI/dx)2+(dI/dy)2) should be used to calculate the image gradient magnitude ( L2gradient=true ),
-		// or whether the default L1 norm =|dI/dx|+|dI/dy| is enough ( L2gradient=false ).
-	};
-
 	struct InitLevelSetParam {
 		InitLevelSetParam() {};
 		InitLevelSetParam(
@@ -96,24 +63,11 @@ namespace ms {
 	};
 
 	struct VisualizationParam {
-		VisualizationParam(bool depth_edge_on_, bool canny_edge_on_, bool merge_edge_on_, bool inv_edge_on_, bool warpping_on_) :
-			depth_edge_on(depth_edge_on_),
-			canny_edge_on(canny_edge_on_),
-			merge_edge_on(merge_edge_on_),
+		VisualizationParam(bool inv_edge_on_, bool warpping_on_) :
 			inv_edge_on(inv_edge_on_),
 			warpping_on(warpping_on_) {}
-		bool depth_edge_on;
-		bool canny_edge_on;
-		bool merge_edge_on;
 		bool inv_edge_on;
 		bool warpping_on;
-	};
-
-	struct EdgeSelectionParam {
-		EdgeSelectionParam(bool use_depth_edge_, bool use_canny_edge_) :
-			use_depth_edge(use_depth_edge_), use_canny_edge(use_canny_edge_) {}
-		bool use_depth_edge;
-		bool use_canny_edge;
 	};
 
 	struct Intrinsic_ {

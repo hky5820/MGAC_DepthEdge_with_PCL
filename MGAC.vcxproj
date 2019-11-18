@@ -84,11 +84,12 @@
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDIr)3rdParty\glm;$(SolutionDir)3rdParty\Realsense\include;$(ProjectDir)include;$(SolutionDir)3rdParty\opencv4.1.2\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDIr)3rdParty\glm;$(SolutionDir)3rdParty\Realsense\include;$(ProjectDir)include;$(SolutionDir)3rdParty\opencv4.1.2\include;$(SolutionDir)3rdParty\pcl1.9.1\include;$(SolutionDir)3rdParty\pcl1.9.1\3rdParty\Boost\include;$(SolutionDir)3rdParty\pcl1.9.1\3rdParty\FLANN\include;$(SolutionDIr)3rdParty\pcl1.9.1\3rdParty\Eigen\eigen3;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>_SILENCE_FPOS_SEEKPOS_DEPRECATION_WARNING;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
-      <AdditionalLibraryDirectories>$(SolutionDir)3rdParty\Realsense\lib\$(Configuration);$(SolutionDir)3rdParty\opencv4.1.2\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>realsense2d.lib;opencv_world412d.lib;opencv_img_hash412d.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SolutionDir)3rdParty\Realsense\lib\$(Configuration);$(SolutionDir)3rdParty\opencv4.1.2\lib;$(SolutionDir)3rdParty\pcl1.9.1\lib;$(SolutionDir)3rdParty\pcl1.9.1\3rdParty\Boost\lib;$(SolutionDir)3rdParty\pcl1.9.1\3rdParty\FLANN\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>realsense2d.lib;opencv_world412d.lib;opencv_img_hash412d.lib;pcl_common_debug.lib;pcl_io_debug.lib;pcl_search_debug.lib;pcl_features_debug.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -113,17 +114,17 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDIr)3rdParty\glm;$(SolutionDir)3rdParty\Realsense\include;$(ProjectDir)include;$(SolutionDir)3rdParty\opencv4.1.2\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDIr)3rdParty\glm;$(SolutionDir)3rdParty\Realsense\include;$(ProjectDir)include;$(SolutionDir)3rdParty\opencv4.1.2\include;$(SolutionDir)3rdParty\pcl1.9.1\include;$(SolutionDir)3rdParty\pcl1.9.1\3rdParty\Boost\include;$(SolutionDir)3rdParty\pcl1.9.1\3rdParty\FLANN\include;$(SolutionDIr)3rdParty\pcl1.9.1\3rdParty\Eigen\eigen3;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>_SILENCE_FPOS_SEEKPOS_DEPRECATION_WARNING;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalLibraryDirectories>$(SolutionDir)3rdParty\Realsense\lib\$(Configuration);$(SolutionDir)3rdParty\opencv4.1.2\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>realsense2.lib;opencv_world412.lib;opencv_img_hash412.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SolutionDir)3rdParty\Realsense\lib\$(Configuration);$(SolutionDir)3rdParty\opencv4.1.2\lib;$(SolutionDir)3rdParty\pcl1.9.1\lib;$(SolutionDir)3rdParty\pcl1.9.1\3rdParty\Boost\lib;$(SolutionDir)3rdParty\pcl1.9.1\3rdParty\FLANN\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>realsense2.lib;opencv_world412.lib;opencv_img_hash412.lib;pcl_common_release.lib;pcl_io_release.lib;pcl_features_release.lib;pcl_search_release.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="depth_edge_detector.cpp" />
     <ClCompile Include="filter.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="morphsnake.cpp" />
@@ -132,7 +133,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\common.h" />
-    <ClInclude Include="include\depth_edge_detector.h" />
     <ClInclude Include="include\filter.h" />
     <ClInclude Include="include\helper.h" />
     <ClInclude Include="include\morphsnake.h" />

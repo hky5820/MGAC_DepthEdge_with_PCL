@@ -1,5 +1,7 @@
 #include "depth_edge_detector.h"
 
+#include <opencv2/highgui.hpp>
+
 #include <glm/glm.hpp>
 
 cv::Mat DepthEdgeDetector::findEdge(const cv::Mat& pc_image, cv::Mat& edge_map,float threshold, int radius) {

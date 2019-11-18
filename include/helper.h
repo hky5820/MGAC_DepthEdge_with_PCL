@@ -3,7 +3,7 @@
 
 #include <opencv2/core.hpp>
 
-//#define PCL
+#define PCL
 #ifdef PCL
 #include <pcl/point_cloud.h>
 #include <pcl/io/ply_io.h>
@@ -105,8 +105,8 @@ namespace pc_helper {
 				x = (u - cx / downscale) * Z / ( fx / downscale);
 				y = (v - cy / downscale) * Z / ( fy / downscale);
 
-				if (x == 0.0 && y == 0.0 && z == 0.0)
-					continue;
+				if (z == 0.0) 
+					x = y = z =  NAN;
 				
 				pc_xyz_data[(v * cols + u) * 3 + 0] = x;
 				pc_xyz_data[(v * cols + u) * 3 + 1] = y;
@@ -138,6 +138,33 @@ namespace pc_helper {
 		return pointcloud_xyz;
 	}
 
+	cv::Mat calcNormalFromDepth(const cv::Mat& depth_image) {
+		int d_height = depth_image.rows;
+		int d_width = depth_image.cols;
+
+		cv::Mat norFloat(depth_image.size(), CV_16SC3);
+#pragma omp parallel for
+		for (int x = 1; x < d_width; x++) {
+			for (int y = 1; y < d_height; y++) {
+
+				cv::Vec3f top(x, y - 1, depth_image.at<unsigned short>(y - 1, x));
+				cv::Vec3f left(x - 1, y, depth_image.at<unsigned short>(y, x - 1));
+				cv::Vec3f current(x, y, depth_image.at<unsigned short>(y, x));
+				cv::Vec3f d = (current - top).cross(current - left);
+				cv::Vec3f n = cv::normalize(d);
+
+				short norm_x = (short)(n[0] * (float)SHRT_MAX);
+				short norm_y = (short)(n[1] * (float)SHRT_MAX);
+				short norm_z = (short)(n[2] * (float)SHRT_MAX);
+
+				norFloat.at<cv::Vec3s>(y, x)[0] = norm_x;
+				norFloat.at<cv::Vec3s>(y, x)[1] = norm_y;
+				norFloat.at<cv::Vec3s>(y, x)[2] = norm_z;
+			}
+		}
+		return norFloat;
+	}
+
 #ifdef  PCL
 	void savePointCloutWithMask(const cv::Mat& depth_image, const cv::Mat& mask, float fx, float fy, float cx, float cy) {
 		if (!depth_image.data) {
@@ -150,11 +177,11 @@ namespace pc_helper {
 		uchar* mask_data = (uchar*)mask.data;
 
 		pcl::PointCloud<pcl::PointXYZ> pointcloud_xyz_;
-		//pointcloud_xyz_.height = depth_image.rows;
-		//pointcloud_xyz_.width = depth_image.cols;
-		//pointcloud_xyz_.resize(pointcloud_xyz_.height * pointcloud_xyz_.width);
+		pointcloud_xyz_.height = depth_image.rows;
+		pointcloud_xyz_.width = depth_image.cols;
+		pointcloud_xyz_.resize(pointcloud_xyz_.height * pointcloud_xyz_.width);
 
-//#pragma omp parallel for
+#pragma omp parallel for
 		for (int v = 0; v < depth_image.rows; ++v) {
 			for (int u = 0; u < depth_image.cols; ++u) {
 				float Z = d_img_data[v * cols + u];
@@ -172,7 +199,7 @@ namespace pc_helper {
 					xyz.x = x;
 					xyz.y = y;
 					xyz.z = z;
-					pointcloud_xyz_.push_back(xyz);
+					pointcloud_xyz_.at(u, v) = xyz;
 				}
 			}
 		}
@@ -180,16 +207,16 @@ namespace pc_helper {
 		pcl::io::savePLYFile("pc.ply", pointcloud_xyz_);
 }
 
-	void depthToPointcloud_pcl(cv::Mat& depth_image, float fx, float fy, float cx, float cy, pcl::PointCloud<pcl::PointXYZ>::Ptr pointcloud_xyz) {
+	void depthToPointcloud_pcl(const cv::Mat& color_image, const cv::Mat& depth_image, float fx, float fy, float cx, float cy, int downscale, pcl::PointCloud<pcl::PointXYZRGB>::Ptr pointcloud_xyz) {
 		if (!depth_image.data) {
 			std::cerr << "No depth data!!!" << std::endl;
 			exit(EXIT_FAILURE);
 		}
 
-		//pcl::PointCloud<pcl::PointXYZ> pointcloud_xyz_;
-		//pointcloud_xyz_.height = depth_image.rows;
-		//pointcloud_xyz_.width = depth_image.cols;
-		//pointcloud_xyz_.resize(pointcloud_xyz_.height * pointcloud_xyz_.width);
+		(*pointcloud_xyz).height = depth_image.rows;
+		(*pointcloud_xyz).width = depth_image.cols;
+		(*pointcloud_xyz).resize((*pointcloud_xyz).height * (*pointcloud_xyz).width);
+		(*pointcloud_xyz).is_dense = false;
 
 #pragma omp parallel for
 		for (int v = 0; v < depth_image.rows; ++v) {
@@ -198,18 +225,22 @@ namespace pc_helper {
 
 				float x, y, z;
 				z = Z;
-				x = (u - cx) * Z / fx;
-				y = (v - cy) * Z / fy;
+				x = (u - (cx / downscale)) * Z / (fx / downscale);
+				y = (v - (cy / downscale)) * Z / (fy / downscale);
 
-				if (x == 0.0 && y == 0.0 && z == 0.0)
-					continue;
+				if (z == 0.0) 
+					x = y = z = NAN;
+				
 
-				pcl::PointXYZ xyz;
-				xyz.x = x;
-				xyz.y = y;
-				xyz.z = z;
+				pcl::PointXYZRGB xyzrgb;
+				xyzrgb.x = x / 1000;
+				xyzrgb.y = y / 1000;
+				xyzrgb.z = z / 1000;
+				xyzrgb.r = color_image.at<cv::Vec3b>(v, u)[2];
+				xyzrgb.g = color_image.at<cv::Vec3b>(v, u)[1];
+				xyzrgb.b = color_image.at<cv::Vec3b>(v, u)[0];
 
-				(*pointcloud_xyz).at(u, v) = xyz;
+				(*pointcloud_xyz).at(u, v) = xyzrgb;
 			}
 		}
 	}
