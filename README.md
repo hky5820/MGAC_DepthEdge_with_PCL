@@ -1,4 +1,4 @@
-# MGAC_DepthEdge_with_PCL
+# MGAC_DepthEdge_with_PCL 
 
 ### 1. Inverse Edge Map  
 Inverse Edge Map은 original MGAC 방식을 따른다  
